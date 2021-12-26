@@ -2,7 +2,7 @@ use core::fmt::Display;
 
 const BOARD_SIZE: usize = 64;
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 enum Piece {
     WhitePawn,
     WhiteRook,
@@ -90,24 +90,29 @@ impl Board {
 
         Self { pieces }
     }
+
+    fn move_src_to_dest(&mut self) {}
+
+    fn move_i_to_j(&mut self, i: usize, j: usize) {
+        self.pieces[j] = std::mem::take(&mut self.pieces[i]);
+    }
 }
 
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut repr = String::new();
+        repr.push_str("    a   b   c   d   e   f   g   h\n");
         for i in 0..8 {
-            repr.push_str("+---+---+---+---+---+---+---+---+\n");
+            repr.push_str("  +---+---+---+---+---+---+---+---+\n");
+            repr.push_str(format!("{} ", 8 - i).as_str());
             for j in 0..8 {
-                if i != 0 && i % 8 == 0 {
-                    repr.push_str("|\n");
-                }
                 repr.push_str(format!("| {} ", self.pieces[i * 8 + j]).as_str());
             }
-            repr.push_str("|\n");
+            repr.push_str(format!("| {}\n", 8 - i).as_str());
         }
-        repr.push_str("+---+---+---+---+---+---+---+---+\n");
+        repr.push_str("  +---+---+---+---+---+---+---+---+\n");
+        repr.push_str("    a   b   c   d   e   f   g   h\n");
         f.write_str(repr.as_str())?;
-
         Ok(())
     }
 }
@@ -115,4 +120,17 @@ impl Display for Board {
 fn main() {
     let board = Board::new();
     println!("{}", board);
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_move_i_to_j() {
+        let mut b = Board::new();
+        b.move_i_to_j(8, 16);
+        assert_eq!(b.pieces[8], Piece::Blank);
+        assert_eq!(b.pieces[16], Piece::BlackPawn);
+    }
 }
