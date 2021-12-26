@@ -91,10 +91,62 @@ impl Board {
         Self { pieces }
     }
 
-    fn move_src_to_dst(&mut self, src: &str, dst: &str) {}
+    fn make_move(&mut self, move_str: &str) -> Result<(), ChessError> {
+        let move_str = move_str.trim();
+        let mut pos = move_str.split_whitespace();
+        let len = move_str.split_whitespace();
+        let len = len.count();
+        if len != 2 {
+            return Err(ChessError::InvalidMove);
+        }
 
-    fn pos_to_index(pos: &str) -> usize {
-        0usize
+        let src = pos.next().unwrap();
+        let dst = pos.next().unwrap();
+        self.move_src_to_dst(src, dst)?;
+        Ok(())
+    }
+
+    fn move_src_to_dst(&mut self, src: &str, dst: &str) -> Result<(), ChessError> {
+        let src = Self::pos_to_index(src)?;
+        let dst = Self::pos_to_index(dst)?;
+        self.move_i_to_j(src, dst);
+        Ok(())
+    }
+
+    fn pos_to_index(pos: &str) -> Result<usize, ChessError> {
+        let pos = pos.trim();
+        if pos.len() != 2 {
+            return Err(ChessError::InvalidPosition);
+        };
+
+        let pos = pos.to_lowercase();
+        let mut chs = pos.chars();
+
+        // Safe because length was checked
+        let first = chs.next().unwrap();
+        let second = chs.next().unwrap();
+
+        if !matches!(first, 'a'..='h') {
+            return Err(ChessError::InvalidPosition);
+        } else if !matches!(second, '1'..='8') {
+            return Err(ChessError::InvalidPosition);
+        }
+
+        let x: usize = match first {
+            'a' => 0,
+            'b' => 1,
+            'c' => 2,
+            'd' => 3,
+            'e' => 4,
+            'f' => 5,
+            'g' => 6,
+            'h' => 7,
+            _ => return Err(ChessError::InvalidPosition),
+        };
+        let y = second.to_digit(10).unwrap() as usize;
+        let y = 8 - y;
+
+        Ok(x + y * 8)
     }
 
     fn move_i_to_j(&mut self, i: usize, j: usize) {
@@ -122,7 +174,9 @@ impl Display for Board {
 }
 
 fn main() {
-    let board = Board::new();
+    let mut board = Board::new();
+    println!("{}", board);
+    board.make_move("c7 c5").expect("");
     println!("{}", board);
 }
 
@@ -137,4 +191,10 @@ mod tests {
         assert_eq!(b.pieces[8], Piece::Blank);
         assert_eq!(b.pieces[16], Piece::BlackPawn);
     }
+}
+
+#[derive(Clone, Debug, PartialEq)]
+enum ChessError {
+    InvalidPosition,
+    InvalidMove,
 }
