@@ -95,13 +95,17 @@ impl Board {
 impl Display for Board {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let mut repr = String::new();
-        for i in 0..BOARD_SIZE {
-            if i != 0 && i % 8 == 0 {
-                repr.push('\n');
+        for i in 0..8 {
+            repr.push_str("+---+---+---+---+---+---+---+---+\n");
+            for j in 0..8 {
+                if i != 0 && i % 8 == 0 {
+                    repr.push_str("|\n");
+                }
+                repr.push_str(format!("| {} ", self.pieces[i * 8 + j]).as_str());
             }
-
-            repr.push_str(format!("{}", self.pieces[i]).as_str());
+            repr.push_str("|\n");
         }
+        repr.push_str("+---+---+---+---+---+---+---+---+\n");
         f.write_str(repr.as_str())?;
 
         Ok(())
