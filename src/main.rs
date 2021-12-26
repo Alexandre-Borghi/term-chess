@@ -91,7 +91,11 @@ impl Board {
         Self { pieces }
     }
 
-    fn move_src_to_dest(&mut self) {}
+    fn move_src_to_dst(&mut self, src: &str, dst: &str) {}
+
+    fn pos_to_index(pos: &str) -> usize {
+        0usize
+    }
 
     fn move_i_to_j(&mut self, i: usize, j: usize) {
         self.pieces[j] = std::mem::take(&mut self.pieces[i]);
