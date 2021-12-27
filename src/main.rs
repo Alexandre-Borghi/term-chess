@@ -97,7 +97,7 @@ impl Board {
         let len = move_str.split_whitespace();
         let len = len.count();
         if len != 2 {
-            return Err(ChessError::InvalidMove);
+            return Err(ChessError::MoveParse);
         }
 
         let src = pos.next().unwrap();
@@ -116,7 +116,7 @@ impl Board {
     fn pos_to_index(pos: &str) -> Result<usize, ChessError> {
         let pos = pos.trim();
         if pos.len() != 2 {
-            return Err(ChessError::InvalidPosition);
+            return Err(ChessError::PositionParse);
         };
 
         let pos = pos.to_lowercase();
@@ -127,9 +127,9 @@ impl Board {
         let second = chs.next().unwrap();
 
         if !matches!(first, 'a'..='h') {
-            return Err(ChessError::InvalidPosition);
+            return Err(ChessError::PositionParse);
         } else if !matches!(second, '1'..='8') {
-            return Err(ChessError::InvalidPosition);
+            return Err(ChessError::PositionParse);
         }
 
         let x: usize = match first {
@@ -141,7 +141,7 @@ impl Board {
             'f' => 5,
             'g' => 6,
             'h' => 7,
-            _ => return Err(ChessError::InvalidPosition),
+            _ => return Err(ChessError::PositionParse),
         };
         let y = second.to_digit(10).unwrap() as usize;
         let y = 8 - y;
@@ -195,6 +195,6 @@ mod tests {
 
 #[derive(Clone, Debug, PartialEq)]
 enum ChessError {
-    InvalidPosition,
-    InvalidMove,
+    PositionParse,
+    MoveParse,
 }
